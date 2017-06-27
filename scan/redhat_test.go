@@ -60,7 +60,7 @@ func TestParseScanedPackagesLineRedhat(t *testing.T) {
 	}
 
 	for _, tt := range packagetests {
-		p, _ := r.parseScannedPackagesLine(tt.in)
+		p, _ := r.parseInstalledPackagesLine(tt.in)
 		if p.Name != tt.pack.Name {
 			t.Errorf("name: expected %s, actual %s", tt.pack.Name, p.Name)
 		}
@@ -672,25 +672,56 @@ Description : Package updates are available for Amazon Linux AMI that fix the
 	}
 }
 
+func TestParseYumCheckUpdateLine(t *testing.T) {
+	r := newRedhat(config.ServerInfo{})
+	r.Distro = config.Distro{Family: "centos"}
+	var tests = []struct {
+		in  string
+		out models.Package
+	}{
+		{
+			"zlib 0 1.2.7 17.el7 rhui-REGION-rhel-server-releases",
+			models.Package{
+				Name:       "zlib",
+				NewVersion: "1.2.7",
+				NewRelease: "17.el7",
+				Repository: "rhui-REGION-rhel-server-releases",
+			},
+		},
+		{
+			"shadow-utils 2 4.1.5.1 24.el7 rhui-REGION-rhel-server-releases",
+			models.Package{
+				Name:       "shadow-utils",
+				NewVersion: "2:4.1.5.1",
+				NewRelease: "24.el7",
+				Repository: "rhui-REGION-rhel-server-releases",
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		aPack, err := r.parseScanUpdatablePacksLine(tt.in)
+		if err != nil {
+			t.Errorf("Error has occurred, err: %s\ntt.in: %v", err, tt.in)
+			return
+		}
+		if !reflect.DeepEqual(tt.out, aPack) {
+			e := pp.Sprintf("%v", tt.out)
+			a := pp.Sprintf("%v", aPack)
+			t.Errorf("expected %s, actual %s", e, a)
+		}
+	}
+}
+
 func TestParseYumCheckUpdateLines(t *testing.T) {
 	r := newRedhat(config.ServerInfo{})
 	r.Distro = config.Distro{Family: "centos"}
-	stdout := `Loaded plugins: changelog, fastestmirror, keys, protect-packages, protectbase, security
-Loading mirror speeds from cached hostfile
- * base: mirror.fairway.ne.jp
- * epel: epel.mirror.srv.co.ge
- * extras: mirror.fairway.ne.jp
- * updates: mirror.fairway.ne.jp
-0 packages excluded due to repository protections
-
-audit-libs.x86_64              2.3.7-5.el6                   base
-bash.x86_64                    4.1.2-33.el6_7.1              updates
-Obsoleting Packages
-python-libs.i686    2.6.6-64.el6   rhui-REGION-rhel-server-releases
-    python-ordereddict.noarch     1.1-3.el6ev    installed
-bind-utils.x86_64                       30:9.3.6-25.P1.el5_11.8          updates
-pytalloc.x86_64                 2.0.7-2.el6                      @CentOS 6.5/6.5
-`
+	stdout := `audit-libs 0 2.3.7 5.el6 base
+bash 0 4.1.2 33.el6_7.1 updates
+python-libs 0 2.6.6 64.el6 rhui-REGION-rhel-server-releases
+python-ordereddict 0 1.1 3.el6ev installed
+bind-utils 30 9.3.6 25.P1.el5_11.8 updates
+pytalloc 0 2.0.7 2.el6 @CentOS 6.5/6.5`
 
 	r.setPackages(models.NewPackages(
 		models.Package{
@@ -784,7 +815,7 @@ pytalloc.x86_64                 2.0.7-2.el6                      @CentOS 6.5/6.5
 	}
 
 	for _, tt := range tests {
-		packages, err := r.parseYumCheckUpdateLines(tt.in)
+		packages, err := r.parseScanUpdatablePacksLines(tt.in)
 		if err != nil {
 			t.Errorf("Error has occurred, err: %s\ntt.in: %v", err, tt.in)
 			return
@@ -802,13 +833,9 @@ pytalloc.x86_64                 2.0.7-2.el6                      @CentOS 6.5/6.5
 func TestParseYumCheckUpdateLinesAmazon(t *testing.T) {
 	r := newRedhat(config.ServerInfo{})
 	r.Distro = config.Distro{Family: "amazon"}
-	stdout := `Loaded plugins: priorities, update-motd, upgrade-helper
-34 package(s) needed for security, out of 71 available
-
-bind-libs.x86_64           32:9.8.2-0.37.rc1.45.amzn1      amzn-main
-java-1.7.0-openjdk.x86_64  1.7.0.95-2.6.4.0.65.amzn1     amzn-main
-if-not-architecture        100-200                         amzn-main
-`
+	stdout := `bind-libs 32 9.8.2 0.37.rc1.45.amzn1 amzn-main
+java-1.7.0-openjdk  0 1.7.0.95 2.6.4.0.65.amzn1 amzn-main
+if-not-architecture 0 100 200 amzn-main`
 	r.Packages = models.NewPackages(
 		models.Package{
 			Name:    "bind-libs",
@@ -862,7 +889,7 @@ if-not-architecture        100-200                         amzn-main
 	}
 
 	for _, tt := range tests {
-		packages, err := r.parseYumCheckUpdateLines(tt.in)
+		packages, err := r.parseScanUpdatablePacksLines(tt.in)
 		if err != nil {
 			t.Errorf("Error has occurred, err: %s\ntt.in: %v", err, tt.in)
 			return

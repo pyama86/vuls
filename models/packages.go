@@ -42,6 +42,7 @@ func (ps Packages) MergeNewVersion(as Packages) {
 		if pack, ok := ps[a.Name]; ok {
 			pack.NewVersion = a.NewVersion
 			pack.NewRelease = a.NewRelease
+			pack.Repository = a.Repository
 			ps[a.Name] = pack
 		}
 	}

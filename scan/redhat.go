@@ -26,8 +26,6 @@ import (
 	"github.com/future-architect/vuls/config"
 	"github.com/future-architect/vuls/models"
 	"github.com/future-architect/vuls/util"
-
-	"github.com/k0kubun/pp"
 )
 
 // inherit OsTypeInterface
@@ -147,14 +145,14 @@ func (o *redhat) checkIfSudoNoPasswd() error {
 		if majorVersion < 6 {
 			cmds = []cmd{
 				{"yum --color=never repolist", zero},
-				{"yum --color=never check-update", []int{0, 100}},
+				// {"yum --color=never check-update", []int{0, 100}},
 				{"yum --color=never list-security --security", zero},
 				{"yum --color=never info-security", zero},
 			}
 		} else {
 			cmds = []cmd{
 				{"yum --color=never repolist", zero},
-				{"yum --color=never check-update", []int{0, 100}},
+				// {"yum --color=never check-update", []int{0, 100}},
 				{"yum --color=never --security updateinfo list updates", zero},
 				{"yum --color=never --security updateinfo updates", zero},
 			}
@@ -232,16 +230,26 @@ func (o *redhat) checkDependencies() error {
 }
 
 func (o *redhat) scanPackages() error {
-	var err error
-	var packs []models.Package
-	if packs, err = o.scanInstalledPackages(); err != nil {
+	installed, err := o.scanInstalledPackages()
+	if err != nil {
 		o.log.Errorf("Failed to scan installed packages")
 		return err
 	}
-	o.setPackages(models.NewPackages(packs...))
+
+	updatable, err := o.scanUpdatablePackages()
+	if err != nil {
+		o.log.Errorf("Failed to scan installed packages")
+		return err
+	}
+	installed.MergeNewVersion(updatable)
+	o.setPackages(installed)
+
+	if config.Conf.PackageListOnly {
+		return nil
+	}
 
 	var vinfos models.VulnInfos
-	if vinfos, err = o.scanVulnInfos(); err != nil {
+	if vinfos, err = o.scanVulnInfos(updatable); err != nil {
 		o.log.Errorf("Failed to scan vulnerable packages")
 		return err
 	}
@@ -249,42 +257,45 @@ func (o *redhat) scanPackages() error {
 	return nil
 }
 
-func (o *redhat) scanInstalledPackages() (installed []models.Package, err error) {
-	cmd := "rpm -qa --queryformat '%{NAME}\t%{EPOCHNUM}\t%{VERSION}\t%{RELEASE}\n'"
+func (o *redhat) scanInstalledPackages() (models.Packages, error) {
+	installed := models.Packages{}
+	// cmd := "repoquery --all --pkgnarrow=installed --qf='%{NAME} %{EPOCH} %{VERSION} %{RELEASE}'"
+	cmd := "rpm -qa --queryformat '%{NAME} %{EPOCHNUM} %{VERSION} %{RELEASE}\n'"
 	r := o.exec(cmd, noSudo)
 	if r.isSuccess() {
-		//  e.g.
-		// openssl	1.0.1e	30.el6.11
+		// openssl 0 1.0.1e	30.el6.11 base
 		lines := strings.Split(r.Stdout, "\n")
 		for _, line := range lines {
 			if trimed := strings.TrimSpace(line); len(trimed) != 0 {
-				var pack models.Package
-				if pack, err = o.parseScannedPackagesLine(line); err != nil {
-					return
+				pack, err := o.parseInstalledPackagesLine(line)
+				if err != nil {
+					return nil, err
 				}
-				installed = append(installed, pack)
+				installed[pack.Name] = pack
 			}
 		}
-		return
+		return installed, nil
 	}
 
-	return nil, fmt.Errorf(
-		"Scan packages failed. status: %d, stdout: %s, stderr: %s",
+	return nil, fmt.Errorf("Scan packages failed. status: %d, stdout: %s, stderr: %s",
 		r.ExitStatus, r.Stdout, r.Stderr)
+
 }
 
-func (o *redhat) parseScannedPackagesLine(line string) (models.Package, error) {
+func (o *redhat) parseInstalledPackagesLine(line string) (models.Package, error) {
 	fields := strings.Fields(line)
 	if len(fields) != 4 {
 		return models.Package{},
 			fmt.Errorf("Failed to parse package line: %s", line)
 	}
 	ver := ""
-	if fields[1] == "0" {
+	epoch := fields[1]
+	if epoch == "0" {
 		ver = fields[2]
 	} else {
-		ver = fmt.Sprintf("%s:%s", fields[1], fields[2])
+		ver = fmt.Sprintf("%s:%s", epoch, fields[2])
 	}
+
 	return models.Package{
 		Name:    fields[0],
 		Version: ver,
@@ -292,49 +303,93 @@ func (o *redhat) parseScannedPackagesLine(line string) (models.Package, error) {
 	}, nil
 }
 
-func (o *redhat) scanVulnInfos() (models.VulnInfos, error) {
-	if o.Distro.Family != config.CentOS {
-		// Amazon, RHEL, Oracle Linux has yum updateinfo as default
-		// yum updateinfo can collenct vendor advisory information.
-		return o.scanUnsecurePackagesUsingYumPluginSecurity()
-	}
-	// CentOS does not have security channel...
-	// So, yum check-update then parse chnagelog.
-	return o.scanUnsecurePackagesUsingYumCheckUpdate()
-}
-
-// For CentOS
-func (o *redhat) scanUnsecurePackagesUsingYumCheckUpdate() (models.VulnInfos, error) {
-	cmd := "LANGUAGE=en_US.UTF-8 yum --color=never %s check-update"
+func (o *redhat) scanUpdatablePackages() (models.Packages, error) {
+	cmd := "repoquery --all --pkgnarrow=updates --qf='%{NAME} %{EPOCH} %{VERSION} %{RELEASE} %{REPO}'"
 	if o.getServerInfo().Enablerepo != "" {
-		cmd = fmt.Sprintf(cmd, "--enablerepo="+o.getServerInfo().Enablerepo)
-	} else {
-		cmd = fmt.Sprintf(cmd, "")
+		//TODO enablerepo should be split by space
+		//TODO config is comma separated
+		cmd += " --enablerepo=" + o.getServerInfo().Enablerepo
 	}
 
-	r := o.exec(util.PrependProxyEnv(cmd), noSudo)
-	if !r.isSuccess(0, 100) {
-		//returns an exit code of 100 if there are available updates.
+	r := o.exec(util.PrependProxyEnv(cmd), o.sudo())
+	if !r.isSuccess() {
 		return nil, fmt.Errorf("Failed to SSH: %s", r)
 	}
 
-	// get Updateble package name, installed, candidate version.
-	packages, err := o.parseYumCheckUpdateLines(r.Stdout)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to parse %s. err: %s", cmd, err)
+	// Collect Updateble packages, installed, candidate version and repository.
+	return o.parseScanUpdatablePacksLines(r.Stdout)
+}
+
+// parseScanUpdatablePacksLines parse yum check-update to get package name, candidate version
+func (o *redhat) parseScanUpdatablePacksLines(stdout string) (models.Packages, error) {
+	updatable := models.Packages{}
+	lines := strings.Split(stdout, "\n")
+	for _, line := range lines {
+		// if strings.HasPrefix(line, "Obsoleting") ||
+		// strings.HasPrefix(line, "Security:") {
+		// // see https://github.com/future-architect/vuls/issues/165
+		// continue
+		// }
+		if len(strings.TrimSpace(line)) == 0 {
+			continue
+		}
+		pack, err := o.parseScanUpdatablePacksLine(line)
+		if err != nil {
+			return updatable, err
+		}
+		updatable[pack.Name] = pack
 	}
-	o.log.Debugf("%s", pp.Sprintf("%v", packages))
+	return updatable, nil
+}
 
-	// set candidate version info
-	o.Packages.MergeNewVersion(packages)
+func (o *redhat) parseScanUpdatablePacksLine(line string) (models.Package, error) {
+	fields := strings.Fields(line)
+	if len(fields) < 5 {
+		return models.Package{}, fmt.Errorf("Unknown format: %s, fields: %s", line, fields)
+	}
 
+	ver := ""
+	epoch := fields[1]
+	if epoch == "0" {
+		ver = fields[2]
+	} else {
+		ver = fmt.Sprintf("%s:%s", epoch, fields[2])
+	}
+
+	repos := strings.Join(fields[4:len(fields)], " ")
+
+	p := models.Package{
+		Name:       fields[0],
+		NewVersion: ver,
+		NewRelease: fields[3],
+		Repository: repos,
+	}
+	return p, nil
+}
+
+//TODO rename scanUnsecurePackages as same as debian
+func (o *redhat) scanVulnInfos(updatable models.Packages) (models.VulnInfos, error) {
+	if o.Distro.Family != config.CentOS {
+		// Amazon, RHEL, Oracle Linux has yum updateinfo as default
+		// yum updateinfo can collenct vendor advisory information.
+		return o.scanUnsecurePackagesUsingYumPluginSecurity(updatable)
+	}
+	// CentOS does not have security channel...
+	// So, yum check-update then parse chnagelog.
+	return o.scanUnsecurePackagesUsingYumCheckUpdate(updatable)
+
+}
+
+// For CentOS
+func (o *redhat) scanUnsecurePackagesUsingYumCheckUpdate(updatable models.Packages) (models.VulnInfos, error) {
 	// Collect CVE-IDs in changelog
 	type PackageCveIDs struct {
 		Package models.Package
 		CveIDs  []string
 	}
 
-	allChangelog, err := o.getAllChangelog(packages)
+	// TODO repolistでやるべきか
+	allChangelog, err := o.getAllChangelog(updatable)
 	if err != nil {
 		o.log.Errorf("Failed to getAllchangelog. err: %s", err)
 		return nil, err
@@ -363,8 +418,8 @@ func (o *redhat) scanUnsecurePackagesUsingYumCheckUpdate() (models.VulnInfos, er
 
 	var results []PackageCveIDs
 	i := 0
-	for name := range packages {
-		changelog := o.getChangelogCVELines(rpm2changelog, packages[name])
+	for name := range updatable {
+		changelog := o.getChangelogCVELines(rpm2changelog, updatable[name])
 
 		// Collect unique set of CVE-ID in each changelog
 		uniqueCveIDMap := make(map[string]bool)
@@ -382,14 +437,14 @@ func (o *redhat) scanUnsecurePackagesUsingYumCheckUpdate() (models.VulnInfos, er
 			cveIDs = append(cveIDs, k)
 		}
 		p := PackageCveIDs{
-			Package: packages[name],
+			Package: updatable[name],
 			CveIDs:  cveIDs,
 		}
 		results = append(results, p)
 
 		o.log.Infof("(%d/%d) Scanned %s-%s-%s -> %s-%s : %s",
 			i+1,
-			len(packages),
+			len(updatable),
 			p.Package.Name,
 			p.Package.Version,
 			p.Package.Release,
@@ -438,72 +493,6 @@ func (o *redhat) scanUnsecurePackagesUsingYumCheckUpdate() (models.VulnInfos, er
 		}
 	}
 	return vinfos, nil
-}
-
-// parseYumCheckUpdateLines parse yum check-update to get package name, candidate version
-func (o *redhat) parseYumCheckUpdateLines(stdout string) (models.Packages, error) {
-	results := models.Packages{}
-	needToParse := false
-	lines := strings.Split(stdout, "\n")
-	for _, line := range lines {
-		// update information of packages begin after blank line.
-		if trimed := strings.TrimSpace(line); len(trimed) == 0 {
-			needToParse = true
-			continue
-		}
-		if needToParse {
-			if strings.HasPrefix(line, "Obsoleting") ||
-				strings.HasPrefix(line, "Security:") {
-				// see https://github.com/future-architect/vuls/issues/165
-				continue
-			}
-			candidate, err := o.parseYumCheckUpdateLine(line)
-			if err != nil {
-				return results, err
-			}
-
-			installed, found := o.Packages[candidate.Name]
-			if !found {
-				o.log.Warnf("Not found the package in rpm -qa. candidate: %s-%s-%s",
-					candidate.Name, candidate.Version, candidate.Release)
-				results[candidate.Name] = candidate
-				continue
-			}
-			installed.NewVersion = candidate.NewVersion
-			installed.NewRelease = candidate.NewRelease
-			installed.Repository = candidate.Repository
-			results[installed.Name] = installed
-		}
-	}
-	return results, nil
-}
-
-func (o *redhat) parseYumCheckUpdateLine(line string) (models.Package, error) {
-	fields := strings.Fields(line)
-	if len(fields) < 3 {
-		return models.Package{}, fmt.Errorf("Unknown format: %s", line)
-	}
-	splitted := strings.Split(fields[0], ".")
-	packName := ""
-	if len(splitted) == 1 {
-		packName = fields[0]
-	} else {
-		packName = strings.Join(strings.Split(fields[0], ".")[0:(len(splitted)-1)], ".")
-	}
-
-	verfields := strings.Split(fields[1], "-")
-	if len(verfields) != 2 {
-		return models.Package{}, fmt.Errorf("Unknown format: %s", line)
-	}
-	release := verfields[1]
-	repos := strings.Join(fields[2:len(fields)], " ")
-
-	return models.Package{
-		Name:       packName,
-		NewVersion: verfields[0],
-		NewRelease: release,
-		Repository: repos,
-	}, nil
 }
 
 func (o *redhat) mkPstring() *string {
@@ -658,7 +647,7 @@ type distroAdvisoryCveIDs struct {
 
 // Scaning unsecure packages using yum-plugin-security.
 // Amazon, RHEL, Oracle Linux
-func (o *redhat) scanUnsecurePackagesUsingYumPluginSecurity() (models.VulnInfos, error) {
+func (o *redhat) scanUnsecurePackagesUsingYumPluginSecurity(updatable models.Packages) (models.VulnInfos, error) {
 	if o.Distro.Family == config.CentOS {
 		// CentOS has no security channel.
 		// So use yum check-update && parse changelog
@@ -666,6 +655,7 @@ func (o *redhat) scanUnsecurePackagesUsingYumPluginSecurity() (models.VulnInfos,
 			"yum updateinfo is not suppported on CentOS")
 	}
 
+	//TODO repoqueryだとこれがいらない可能性あり sudo
 	cmd := "yum --color=never repolist"
 	r := o.exec(util.PrependProxyEnv(cmd), o.sudo())
 	if !r.isSuccess() {
@@ -678,6 +668,7 @@ func (o *redhat) scanUnsecurePackagesUsingYumPluginSecurity() (models.VulnInfos,
 		return nil, fmt.Errorf("Not implemented yet: %s, err: %s", o.Distro, err)
 	}
 
+	//TODO repoqueryだとこれがいらない可能性あり sudo
 	if (o.Distro.Family == config.RedHat || o.Distro.Family == config.Oracle) && major == 5 {
 		cmd = "yum --color=never list-security --security"
 	} else {
@@ -688,22 +679,6 @@ func (o *redhat) scanUnsecurePackagesUsingYumPluginSecurity() (models.VulnInfos,
 		return nil, fmt.Errorf("Failed to SSH: %s", r)
 	}
 	advIDPackNamesList, err := o.parseYumUpdateinfoListAvailable(r.Stdout)
-
-	// get package name, version, rel to be upgrade.
-	cmd = "LANGUAGE=en_US.UTF-8 yum --color=never check-update"
-	r = o.exec(util.PrependProxyEnv(cmd), o.sudo())
-	if !r.isSuccess(0, 100) {
-		//returns an exit code of 100 if there are available updates.
-		return nil, fmt.Errorf("Failed to SSH: %s", r)
-	}
-	updatable, err := o.parseYumCheckUpdateLines(r.Stdout)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to parse %s. err: %s", cmd, err)
-	}
-	o.log.Debugf("%s", pp.Sprintf("%v", updatable))
-
-	// set candidate version info
-	o.Packages.MergeNewVersion(updatable)
 
 	dict := make(map[string]models.Packages)
 	for _, advIDPackNames := range advIDPackNamesList {
@@ -1032,9 +1007,10 @@ func (o *redhat) clone() osTypeInterface {
 
 func (o *redhat) sudo() bool {
 	switch o.Distro.Family {
-	case config.Amazon:
+	case config.Amazon, config.CentOS:
 		return false
 	default:
+		// RHEL
 		return true
 	}
 }
