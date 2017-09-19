@@ -25,11 +25,11 @@ import (
 	"strings"
 	"time"
 
+	version "github.com/hashicorp/go-version"
 	"github.com/pyama86/vuls/cache"
 	"github.com/pyama86/vuls/config"
 	"github.com/pyama86/vuls/models"
 	"github.com/pyama86/vuls/util"
-	version "github.com/hashicorp/go-version"
 )
 
 // inherit OsTypeInterface
@@ -741,10 +741,13 @@ func (o *debian) parseChangelog(changelog, name, ver string, confidence models.C
 	pack.Changelog = clog
 
 	cves := []DetectedCveID{}
+	cveIDs := []string{}
 	for _, id := range cveIDs {
+		cveIDs = append(cveIDs, id)
 		cves = append(cves, DetectedCveID{id, confidence})
 	}
-	pack.CVEIDs = cves
+
+	pack.CVEIDs = cveIDs
 
 	return cves, &pack, nil
 }
