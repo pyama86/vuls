@@ -24,11 +24,11 @@ import (
 	"os"
 	"path/filepath"
 
-	c "github.com/future-architect/vuls/config"
-	"github.com/future-architect/vuls/models"
-	"github.com/future-architect/vuls/oval"
-	"github.com/future-architect/vuls/report"
-	"github.com/future-architect/vuls/util"
+	c "github.com/pyama86/vuls/config"
+	"github.com/pyama86/vuls/models"
+	"github.com/pyama86/vuls/oval"
+	"github.com/pyama86/vuls/report"
+	"github.com/pyama86/vuls/util"
 	"github.com/google/subcommands"
 )
 

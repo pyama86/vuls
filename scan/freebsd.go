@@ -21,9 +21,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/future-architect/vuls/config"
-	"github.com/future-architect/vuls/models"
-	"github.com/future-architect/vuls/util"
+	"github.com/pyama86/vuls/config"
+	"github.com/pyama86/vuls/models"
+	"github.com/pyama86/vuls/util"
 )
 
 // inherit OsTypeInterface

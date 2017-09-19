@@ -24,9 +24,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/future-architect/vuls/config"
-	"github.com/future-architect/vuls/models"
-	"github.com/future-architect/vuls/util"
+	"github.com/pyama86/vuls/config"
+	"github.com/pyama86/vuls/models"
+	"github.com/pyama86/vuls/util"
 	"github.com/kotakanbe/goval-dictionary/db"
 	ovallog "github.com/kotakanbe/goval-dictionary/log"
 	"github.com/parnurzeal/gorequest"

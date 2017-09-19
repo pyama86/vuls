@@ -5,7 +5,7 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/future-architect/vuls/models"
+	"github.com/pyama86/vuls/models"
 	ovalmodels "github.com/kotakanbe/goval-dictionary/models"
 )
 

@@ -26,9 +26,9 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/future-architect/vuls/config"
-	"github.com/future-architect/vuls/models"
-	"github.com/future-architect/vuls/util"
+	"github.com/pyama86/vuls/config"
+	"github.com/pyama86/vuls/models"
+	"github.com/pyama86/vuls/util"
 	"github.com/google/subcommands"
 	"github.com/gosuri/uitable"
 	"github.com/jroimartin/gocui"

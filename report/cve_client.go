@@ -26,8 +26,8 @@ import (
 	"github.com/cenkalti/backoff"
 	"github.com/parnurzeal/gorequest"
 
-	"github.com/future-architect/vuls/config"
-	"github.com/future-architect/vuls/util"
+	"github.com/pyama86/vuls/config"
+	"github.com/pyama86/vuls/util"
 	cveconfig "github.com/kotakanbe/go-cve-dictionary/config"
 	cvedb "github.com/kotakanbe/go-cve-dictionary/db"
 	cve "github.com/kotakanbe/go-cve-dictionary/models"

@@ -2,7 +2,7 @@ FROM golang:latest
 
 MAINTAINER hikachan sadayuki-matsuno
 
-ENV REPOSITORY github.com/future-architect/vuls
+ENV REPOSITORY github.com/pyama86/vuls
 ENV LOGDIR /var/log/vuls
 ENV WORKDIR /vuls
 # go-cve-dictionary install

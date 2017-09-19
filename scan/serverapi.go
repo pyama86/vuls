@@ -23,11 +23,11 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/future-architect/vuls/cache"
-	"github.com/future-architect/vuls/config"
-	"github.com/future-architect/vuls/models"
-	"github.com/future-architect/vuls/report"
-	"github.com/future-architect/vuls/util"
+	"github.com/pyama86/vuls/cache"
+	"github.com/pyama86/vuls/config"
+	"github.com/pyama86/vuls/models"
+	"github.com/pyama86/vuls/report"
+	"github.com/pyama86/vuls/util"
 )
 
 var servers, errServers []osTypeInterface

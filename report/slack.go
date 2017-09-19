@@ -25,8 +25,8 @@ import (
 	"time"
 
 	"github.com/cenkalti/backoff"
-	"github.com/future-architect/vuls/config"
-	"github.com/future-architect/vuls/models"
+	"github.com/pyama86/vuls/config"
+	"github.com/pyama86/vuls/models"
 	"github.com/parnurzeal/gorequest"
 	log "github.com/sirupsen/logrus"
 )

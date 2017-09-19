@@ -32,8 +32,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 
-	c "github.com/future-architect/vuls/config"
-	"github.com/future-architect/vuls/models"
+	c "github.com/pyama86/vuls/config"
+	"github.com/pyama86/vuls/models"
 )
 
 // S3Writer writes results to S3

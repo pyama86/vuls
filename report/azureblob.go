@@ -26,8 +26,8 @@ import (
 
 	storage "github.com/Azure/azure-sdk-for-go/storage"
 
-	c "github.com/future-architect/vuls/config"
-	"github.com/future-architect/vuls/models"
+	c "github.com/pyama86/vuls/config"
+	"github.com/pyama86/vuls/models"
 )
 
 // AzureBlobWriter writes results to AzureBlob

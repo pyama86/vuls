@@ -144,7 +144,7 @@ $ docker run --rm -it \
 
 ## Step2. Configuration
 
-Create config.toml referring to [this](https://github.com/future-architect/vuls#configuration).
+Create config.toml referring to [this](https://github.com/pyama86/vuls#configuration).
 
 ```toml
 [servers]
@@ -209,16 +209,16 @@ $docker run -dt \
 
 ## Documentation
 
-Documentation for this image is stored in the [`docker/` directory]() of the [`future-architect/vuls` GitHub repo](https://github.com/future-architect/vuls). 
+Documentation for this image is stored in the [`docker/` directory]() of the [`pyama86/vuls` GitHub repo](https://github.com/pyama86/vuls). 
 
 ## Issues
 
-If you have any problems with or questions about this image, please contact us through a [GitHub issue](https://github.com/future-architect/vuls/issues). 
+If you have any problems with or questions about this image, please contact us through a [GitHub issue](https://github.com/pyama86/vuls/issues). 
 
 ## Contributing
 
-1. fork a repository: github.com/future-architect/vuls to github.com/you/repo
-1. get original code: go get github.com/future-architect/vuls
+1. fork a repository: github.com/pyama86/vuls to github.com/you/repo
+1. get original code: go get github.com/pyama86/vuls
 1. work on original code
 1. add remote to your repo: git remote add myfork https://github.com/you/repo.git
 1. push your changes: git push myfork

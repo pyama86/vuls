@@ -26,8 +26,8 @@ import (
 	"os"
 	"path/filepath"
 
-	c "github.com/future-architect/vuls/config"
-	"github.com/future-architect/vuls/models"
+	c "github.com/pyama86/vuls/config"
+	"github.com/pyama86/vuls/models"
 )
 
 // LocalFileWriter writes results to a local file.

@@ -22,7 +22,7 @@ import (
 	"os"
 
 	"github.com/BurntSushi/toml"
-	"github.com/future-architect/vuls/contrib/owasp-dependency-check/parser"
+	"github.com/pyama86/vuls/contrib/owasp-dependency-check/parser"
 	log "github.com/sirupsen/logrus"
 )
 

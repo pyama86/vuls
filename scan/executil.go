@@ -34,8 +34,8 @@ import (
 	"golang.org/x/crypto/ssh/agent"
 
 	"github.com/cenkalti/backoff"
-	conf "github.com/future-architect/vuls/config"
-	"github.com/future-architect/vuls/util"
+	conf "github.com/pyama86/vuls/config"
+	"github.com/pyama86/vuls/util"
 	"github.com/sirupsen/logrus"
 )
 

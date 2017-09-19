@@ -7,7 +7,7 @@
 
 Vulnerability scanner for Linux/FreeBSD, agentless, written in golang.
 
-[README in English](https://github.com/future-architect/vuls/blob/master/README.md)  
+[README in English](https://github.com/pyama86/vuls/blob/master/README.md)  
 Slackチームは[こちらから](http://goo.gl/forms/xm5KFo35tu)参加できます。(日本語でオッケーです)  
 Twitter:  日本語: [@vuls_ja](https://twitter.com/vuls_ja), 英語: [@vuls_en](https://twitter.com/vuls_en)
 
@@ -187,7 +187,7 @@ Vulsは上に挙げた手動運用での課題を解決するツールであり�
 Vulsのセットアップは以下の2パターンがある
 
 -  Dockerコンテナ上にセットアップ  
-see https://github.com/future-architect/vuls/tree/master/setup/docker  
+see https://github.com/pyama86/vuls/tree/master/setup/docker  
 
 - 手動でセットアップ  
 チュートリアルでは手動でのセットアップ方法で説明する
@@ -335,7 +335,7 @@ $ goval-dictionary fetch-redhat 7
 ```
 $ mkdir -p $GOPATH/src/github.com/future-architect
 $ cd $GOPATH/src/github.com/future-architect
-$ git clone https://github.com/future-architect/vuls.git
+$ git clone https://github.com/pyama86/vuls.git
 $ cd vuls
 $ make install
 ```
@@ -853,7 +853,7 @@ configtest:
   -ask-key-password
         Ask ssh privatekey password before scanning
   -config string
-        /path/to/toml (default "/Users/kotakanbe/go/src/github.com/future-architect/vuls/config.toml")
+        /path/to/toml (default "/Users/kotakanbe/go/src/github.com/pyama86/vuls/config.toml")
   -containers-only
         Test containers only. Default: Test both of hosts and containers
   -debug
@@ -1231,7 +1231,7 @@ report:
   -log-dir string
         /path/to/log (default "/var/log/vuls")
   -ovaldb-path string
-        /path/to/sqlite3 (For get oval detail from oval.sqlite3) (default "/Users/kotakanbe/go/src/github.com/future-architect/vuls/oval.sqlite3")
+        /path/to/sqlite3 (For get oval detail from oval.sqlite3) (default "/Users/kotakanbe/go/src/github.com/pyama86/vuls/oval.sqlite3")
   -ovaldb-type string
         DB type for fetching OVAL dictionary (sqlite3 or mysql) (default "sqlite3")
   -ovaldb-url string
@@ -1618,7 +1618,7 @@ tui:
   -cvedb-url string
         http://cve-dictionary.com:8080 or DB connection string
   -ovaldb-path string
-        /path/to/sqlite3 (For get oval detail from oval.sqlite3) (default "/Users/kotakanbe/go/src/github.com/future-architect/vuls/oval.sqlite3")
+        /path/to/sqlite3 (For get oval detail from oval.sqlite3) (default "/Users/kotakanbe/go/src/github.com/pyama86/vuls/oval.sqlite3")
   -ovaldb-type string
         DB type for fetching OVAL dictionary (sqlite3 or mysql) (default "sqlite3")
   -ovaldb-url string
@@ -1647,7 +1647,7 @@ Key binding is below.
 | Ctrl+j, Ctrl+k | move cursor to up/down |
 | Ctrl+u, Ctrl+d | page up/down |
 
-For details, see https://github.com/future-architect/vuls/blob/master/report/tui.go
+For details, see https://github.com/pyama86/vuls/blob/master/report/tui.go
 
 ## Display the previous scan results
 
@@ -1772,7 +1772,7 @@ $ make install
 
 - Update vuls
 ```
-$ cd $GOPATH/src/github.com/future-architect/vuls
+$ cd $GOPATH/src/github.com/pyama86/vuls
 $ git pull
 $ rm -r vendor
 $ make install
@@ -1850,14 +1850,14 @@ Youtube
 
 # Authors
 
-kotakanbe ([@kotakanbe](https://twitter.com/kotakanbe)) created vuls and [these fine people](https://github.com/future-architect/vuls/graphs/contributors) have contributed.
+kotakanbe ([@kotakanbe](https://twitter.com/kotakanbe)) created vuls and [these fine people](https://github.com/pyama86/vuls/graphs/contributors) have contributed.
 
 ----
 
 # Contribute
 
-1. fork a repository: github.com/future-architect/vuls to github.com/you/repo
-2. get original code: go get github.com/future-architect/vuls
+1. fork a repository: github.com/pyama86/vuls to github.com/you/repo
+2. get original code: go get github.com/pyama86/vuls
 3. work on original code
 4. add remote to your repo: git remote add myfork https://github.com/you/repo.git
 5. push your changes: git push myfork
@@ -1869,15 +1869,15 @@ kotakanbe ([@kotakanbe](https://twitter.com/kotakanbe)) created vuls and [these 
 
 # Change Log
 
-Please see [CHANGELOG](https://github.com/future-architect/vuls/blob/master/CHANGELOG.md).
+Please see [CHANGELOG](https://github.com/pyama86/vuls/blob/master/CHANGELOG.md).
 
 ----
 # Stargazers over time		
 		
-[![Stargazers over time](https://starcharts.herokuapp.com/future-architect/vuls.svg)](https://starcharts.herokuapp.com/future-architect/vuls)		
+[![Stargazers over time](https://starcharts.herokuapp.com/pyama86/vuls.svg)](https://starcharts.herokuapp.com/pyama86/vuls)		
 
 -----
 
 # License
 
-Please see [LICENSE](https://github.com/future-architect/vuls/blob/master/LICENSE).
+Please see [LICENSE](https://github.com/pyama86/vuls/blob/master/LICENSE).

@@ -20,8 +20,8 @@ package cache
 import (
 	"time"
 
-	"github.com/future-architect/vuls/config"
-	"github.com/future-architect/vuls/models"
+	"github.com/pyama86/vuls/config"
+	"github.com/pyama86/vuls/models"
 )
 
 // DB has a cache instance

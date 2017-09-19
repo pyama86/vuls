@@ -24,9 +24,9 @@ import (
 	"time"
 
 	"github.com/cenkalti/backoff"
-	"github.com/future-architect/vuls/config"
-	"github.com/future-architect/vuls/models"
-	"github.com/future-architect/vuls/util"
+	"github.com/pyama86/vuls/config"
+	"github.com/pyama86/vuls/models"
+	"github.com/pyama86/vuls/util"
 	debver "github.com/knqyf263/go-deb-version"
 	rpmver "github.com/knqyf263/go-rpm-version"
 	"github.com/kotakanbe/goval-dictionary/db"

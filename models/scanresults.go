@@ -22,7 +22,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/future-architect/vuls/config"
+	"github.com/pyama86/vuls/config"
 )
 
 // ScanResults is a slide of ScanResult

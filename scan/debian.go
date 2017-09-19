@@ -25,10 +25,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/future-architect/vuls/cache"
-	"github.com/future-architect/vuls/config"
-	"github.com/future-architect/vuls/models"
-	"github.com/future-architect/vuls/util"
+	"github.com/pyama86/vuls/cache"
+	"github.com/pyama86/vuls/config"
+	"github.com/pyama86/vuls/models"
+	"github.com/pyama86/vuls/util"
 	version "github.com/hashicorp/go-version"
 )
 
@@ -452,7 +452,7 @@ func (o *debian) parseAptGetUpgrade(stdout string) (updatableNames []string, err
 
 // DetectedCveID has CveID, Confidence and DetectionMethod fields
 // LenientMatching will be true if this vulnerability is not detected by accurate version matching.
-// see https://github.com/future-architect/vuls/pull/328
+// see https://github.com/pyama86/vuls/pull/328
 type DetectedCveID struct {
 	CveID      string
 	Confidence models.Confidence

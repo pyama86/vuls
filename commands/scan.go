@@ -26,9 +26,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	c "github.com/future-architect/vuls/config"
-	"github.com/future-architect/vuls/scan"
-	"github.com/future-architect/vuls/util"
+	c "github.com/pyama86/vuls/config"
+	"github.com/pyama86/vuls/scan"
+	"github.com/pyama86/vuls/util"
 	"github.com/google/subcommands"
 	"github.com/k0kubun/pp"
 )
@@ -183,7 +183,7 @@ func (p *ScanCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}) 
 	if err != nil {
 		util.Log.Errorf("Error loading %s, %s", p.configPath, err)
 		util.Log.Errorf("If you update Vuls and get this error, there may be incompatible changes in config.toml")
-		util.Log.Errorf("Please check README: https://github.com/future-architect/vuls#configuration")
+		util.Log.Errorf("Please check README: https://github.com/pyama86/vuls#configuration")
 		return subcommands.ExitUsageError
 	}
 

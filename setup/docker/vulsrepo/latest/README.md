@@ -5,7 +5,7 @@ See the [Hub page](https://hub.docker.com/r/vuls/vulsrepo/) for the full readme 
 
 # Supported tags and respective `Dockerfile` links
 
-- [`latest` (*vulsrepo:latest Dockerfile*)](https://github.com/future-architect/vuls/blob/master/setup/docker/vulsrepo/latest/Dockerfile)
+- [`latest` (*vulsrepo:latest Dockerfile*)](https://github.com/pyama86/vuls/blob/master/setup/docker/vulsrepo/latest/Dockerfile)
 
 # Caution
 
@@ -14,7 +14,7 @@ If you want to use the latest docker image, you should remove the existing image
 
 # What is vulsrepo?
 
-VulsRepo is visualized based on the json report output in [vuls](https://github.com/future-architect/vuls).
+VulsRepo is visualized based on the json report output in [vuls](https://github.com/pyama86/vuls).
 
 # How to use this image
 
@@ -31,16 +31,16 @@ $docker run -dt \
 
 ## Documentation
 
-Documentation for this image is stored in the [`docker/` directory](https://github.com/future-architect/vuls/tree/master/setup/docker) of the [`future-architect/vuls` GitHub repo](https://github.com/future-architect/vuls). 
+Documentation for this image is stored in the [`docker/` directory](https://github.com/pyama86/vuls/tree/master/setup/docker) of the [`pyama86/vuls` GitHub repo](https://github.com/pyama86/vuls). 
 
 ## Issues
 
-If you have any problems with or questions about this image, please contact us through a [GitHub issue](https://github.com/future-architect/vuls/issues). 
+If you have any problems with or questions about this image, please contact us through a [GitHub issue](https://github.com/pyama86/vuls/issues). 
 
 ## Contributing
 
-1. fork a repository: github.com/future-architect/vuls to github.com/you/repo
-1. get original code: go get github.com/future-architect/vuls
+1. fork a repository: github.com/pyama86/vuls to github.com/you/repo
+1. get original code: go get github.com/pyama86/vuls
 1. work on original code
 1. add remote to your repo: git remote add myfork https://github.com/you/repo.git
 1. push your changes: git push myfork

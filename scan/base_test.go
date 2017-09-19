@@ -21,7 +21,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/future-architect/vuls/config"
+	"github.com/pyama86/vuls/config"
 )
 
 func TestParseDockerPs(t *testing.T) {

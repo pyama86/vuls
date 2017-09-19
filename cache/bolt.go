@@ -23,7 +23,7 @@ import (
 	"time"
 
 	"github.com/boltdb/bolt"
-	"github.com/future-architect/vuls/util"
+	"github.com/pyama86/vuls/util"
 	"github.com/sirupsen/logrus"
 )
 
