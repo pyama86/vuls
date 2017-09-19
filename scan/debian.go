@@ -29,8 +29,7 @@ import (
 	"github.com/future-architect/vuls/config"
 	"github.com/future-architect/vuls/models"
 	"github.com/future-architect/vuls/util"
-
-	"github.com/knqyf263/go-deb-version"
+	version "github.com/hashicorp/go-version"
 )
 
 // inherit OsTypeInterface
@@ -745,6 +744,7 @@ func (o *debian) parseChangelog(changelog, name, ver string, confidence models.C
 	for _, id := range cveIDs {
 		cves = append(cves, DetectedCveID{id, confidence})
 	}
+	pack.CVEIDs = cves
 
 	return cves, &pack, nil
 }

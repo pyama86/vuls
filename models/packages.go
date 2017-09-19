@@ -91,6 +91,7 @@ type Package struct {
 	Arch       string
 	Repository string
 	Changelog  Changelog
+	CVEIDs     []DetectedCveID
 }
 
 // FormatVer returns package version-release

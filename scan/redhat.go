@@ -637,6 +637,7 @@ func (o *redhat) scanCveIDsInChangelog(updatable models.Packages) (models.VulnIn
 			}
 		}
 		packCveIDs[name] = cveIDs
+		pack.CVEIDs = cveIDs
 	}
 
 	// transform datastructure
